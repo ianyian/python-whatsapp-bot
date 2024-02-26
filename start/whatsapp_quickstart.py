@@ -33,8 +33,9 @@ def send_whatsapp_message():
         "messaging_product": "whatsapp",
         "to": RECIPIENT_WAID,
         "type": "template",
-        "template": {"name": "hello_world", "language": {"code": "en_US"}},
+        "template": {"name": "hello_world", "language": {"code": "en_US"}}
     }
+
     response = requests.post(url, headers=headers, json=data)
     return response
 
@@ -102,7 +103,8 @@ async def send_message(data):
     }
 
     async with aiohttp.ClientSession() as session:
-        url = "https://graph.facebook.com" + f"/{VERSION}/{PHONE_NUMBER_ID}/messages"
+        url = "https://graph.facebook.com" + \
+            f"/{VERSION}/{PHONE_NUMBER_ID}/messages"
         try:
             async with session.post(url, data=data, headers=headers) as response:
                 if response.status == 200:
