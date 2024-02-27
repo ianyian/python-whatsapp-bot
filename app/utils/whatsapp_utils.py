@@ -3,7 +3,7 @@ from flask import current_app, jsonify
 import json
 import requests
 
-# from app.services.openai_service import generate_response
+from app.services.openai_service import generate_response
 import re
 
 
@@ -25,9 +25,9 @@ def get_text_message_input(recipient, text):
     )
 
 
-def generate_response(response):
-    # Return text in uppercase
-    return response.upper()
+# def generate_response(response):
+#    # Return text in uppercase
+#    return response.upper()
 
 
 def send_message(data):
@@ -42,7 +42,8 @@ def send_message(data):
         response = requests.post(
             url, data=data, headers=headers, timeout=10
         )  # 10 seconds timeout as an example
-        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+        # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+        response.raise_for_status()
     except requests.Timeout:
         logging.error("Timeout occurred while sending message")
         return jsonify({"status": "error", "message": "Request timed out"}), 408
@@ -76,20 +77,25 @@ def process_text_for_whatsapp(text):
 
 
 def process_whatsapp_message(body):
+
     wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
     name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
 
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message_body = message["text"]["body"]
+    print("XJ:  message: " + str(message) + " message_body: " +
+          message_body + " msgbody :" + str(body))
 
     # TODO: implement custom function here
-    response = generate_response(message_body)
-
+    # response = generate_response(message_body)
+    # print("response1 : " + response)
+    # print("wa_id1: " + wa_id + " name: " + name)
     # OpenAI Integration
-    # response = generate_response(message_body, wa_id, name)
-    # response = process_text_for_whatsapp(response)
+    response = generate_response(message_body, wa_id, name)
+    response = process_text_for_whatsapp(response)
 
-    data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
+    data = get_text_message_input(
+        current_app.config["RECIPIENT_WAID"], response)
     send_message(data)
 
 
